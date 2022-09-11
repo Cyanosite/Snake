@@ -30,7 +30,7 @@ public class GamePanel extends JPanel implements ActionListener {
         this.setFocusable(true);
         this.setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         this.addKeyListener(new GamePanelKeyAdapter());
-        timer = new Timer(300, this);
+        timer = new Timer(INITIAL_DELAY, this);
         timer.start();
         random = new Random();
         snakeParts.add(new Coordinate(0, 0));
@@ -92,7 +92,7 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     private void gameOver() {
-        System.out.println("Game over");
+        System.out.println("Game over, score: " + score);
         timer.stop();
     }
 
