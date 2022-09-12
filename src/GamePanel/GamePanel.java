@@ -22,24 +22,31 @@ public class GamePanel extends JPanel implements ActionListener {
     private static final int HORIZONTAL_UNITS = PANEL_WIDTH / UNIT_SIZE;
     private static final int VERTICAL_UNITS = PANEL_HEIGHT / UNIT_SIZE;
     private static final int INITIAL_DELAY = 300;
+    private final JFrame frame;
     private final Timer timer;
     private int score = 0;
     private final Random random;
     private final ArrayList<Coordinate> snakeParts = new ArrayList<>();
     private Coordinate snakeHead;
     private Coordinate applePosition;
-    private Direction snakeDirection = Direction.right;
-    public GamePanel() {
-        this.setFocusable(true);
-        this.setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
-        this.addKeyListener(new GamePanelKeyAdapter());
-        timer = new Timer(INITIAL_DELAY, this);
-        timer.start();
-        random = new Random();
+    private Direction snakeDirection;
+    private void resetSnake() {
+        snakeParts.clear();
         snakeParts.add(new Coordinate(0, 0));
         snakeParts.add(new Coordinate(1, 0));
         snakeParts.add(new Coordinate(2, 0));
         snakeHead = snakeParts.get(2);
+        snakeDirection = Direction.right;
+    }
+    public GamePanel(JFrame frame) {
+        this.frame = frame;
+        this.setFocusable(true);
+        this.setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
+        this.addKeyListener(new GamePanel.ChangeDirectionKeyAdapter());
+        random = new Random();
+        timer = new Timer(INITIAL_DELAY, this);
+        timer.start();
+        resetSnake();
         spawnApple();
     }
 
@@ -95,15 +102,20 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     private void gameOver() {
-        System.out.println("Game over, score: " + score);
         timer.stop();
+        Object[] options = {"Yes", "No"};
+        int choice = JOptionPane.showOptionDialog(this, "Game Over! Your score: " + score + " Start New Game?", "Game Over", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        switch (choice) {
+            case 0 -> newGame();
+            case 1 -> frame.dispose();
+        }
     }
 
     private void collectApple() {
         snakeParts.add(new Coordinate(applePosition));
         snakeHead = snakeParts.get(snakeParts.size() - 1);
         ++score;
-        timer.setDelay(timer.getDelay()-10);
+        timer.setDelay((int) (timer.getDelay()*0.95));
     }
 
     private boolean detectBorderCollision() {
@@ -115,13 +127,13 @@ public class GamePanel extends JPanel implements ActionListener {
                 return snakeHead.y == 0;
             }
             case down -> {
-                return snakeHead.y == VERTICAL_UNITS - 2;
+                return snakeHead.y == VERTICAL_UNITS - 1;
             }
             case left -> {
                 return snakeHead.x == 0;
             }
             case right -> {
-                return snakeHead.x == HORIZONTAL_UNITS - 2;
+                return snakeHead.x == HORIZONTAL_UNITS - 1;
             }
         }
         return false;
@@ -171,6 +183,12 @@ public class GamePanel extends JPanel implements ActionListener {
         repaint();
     }
 
+    private void newGame() {
+        resetSnake();
+        spawnApple();
+        timer.start();
+    }
+
     private boolean headCanMove(Direction direction) {
         switch (direction) {
             case up:
@@ -205,7 +223,7 @@ public class GamePanel extends JPanel implements ActionListener {
         return true;
     }
 
-        class GamePanelKeyAdapter extends KeyAdapter {
+    class ChangeDirectionKeyAdapter extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent keyEvent) {
             switch (keyEvent.getKeyChar()) {
@@ -229,8 +247,10 @@ public class GamePanel extends JPanel implements ActionListener {
                         snakeDirection = Direction.right;
                     }
                     break;
+                case ' ':
+                    newGame();
+                    break;
             }
         }
     }
-
 }
