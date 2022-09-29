@@ -1,4 +1,4 @@
-package Coordinate;
+package coordinate;
 
 public class Coordinate {
     public int x;

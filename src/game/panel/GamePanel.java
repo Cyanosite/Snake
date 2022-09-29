@@ -1,6 +1,6 @@
-package GamePanel;
+package game.panel;
 
-import Coordinate.Coordinate;
+import coordinate.Coordinate;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +15,7 @@ enum Direction {
     up, down, left, right
 }
 
+// TODO: Add scoreboard and edit alert to show personal best
 public class GamePanel extends JPanel implements ActionListener {
     private static final int PANEL_WIDTH = 800;
     private static final int PANEL_HEIGHT = 500;
@@ -23,13 +24,14 @@ public class GamePanel extends JPanel implements ActionListener {
     private static final int VERTICAL_UNITS = PANEL_HEIGHT / UNIT_SIZE;
     private static final int INITIAL_DELAY = 300;
     private final JFrame frame;
-    private final Timer timer;
+    private final Timer timer = new Timer(INITIAL_DELAY, this);
     private int score = 0;
-    private final Random random;
+    private final Random random = new Random();
     private final ArrayList<Coordinate> snakeParts = new ArrayList<>();
     private Coordinate snakeHead;
     private Coordinate applePosition;
     private Direction snakeDirection;
+
     private void resetSnake() {
         snakeParts.clear();
         snakeParts.add(new Coordinate(0, 0));
@@ -38,20 +40,16 @@ public class GamePanel extends JPanel implements ActionListener {
         snakeHead = snakeParts.get(2);
         snakeDirection = Direction.right;
     }
+
     public GamePanel(JFrame frame) {
         this.frame = frame;
         this.setFocusable(true);
         this.setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         this.addKeyListener(new GamePanel.ChangeDirectionKeyAdapter());
-        random = new Random();
-        timer = new Timer(INITIAL_DELAY, this);
-        timer.start();
-        resetSnake();
-        spawnApple();
     }
 
     private boolean isApplePositionInValid() {
-        for (Coordinate part: snakeParts) {
+        for (Coordinate part : snakeParts) {
             if (part.x == applePosition.x && part.y == applePosition.y) {
                 return true;
             }
@@ -84,12 +82,12 @@ public class GamePanel extends JPanel implements ActionListener {
 
     private void paintSnake(Graphics graphics) {
         graphics.setColor(Color.GREEN);
-        for (var part: snakeParts) {
-            graphics.fillRect(part.x*UNIT_SIZE, part.y*UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+        for (var part : snakeParts) {
+            graphics.fillRect(part.x * UNIT_SIZE, part.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
             //graphics.fillRect(snakeParts.get(i).x*UNIT_SIZE, snakeParts.get(i).y*UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
         }
         graphics.setColor(Color.decode("0x0CB312"));
-        graphics.fillRect(snakeHead.x*UNIT_SIZE, snakeHead.y*UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+        graphics.fillRect(snakeHead.x * UNIT_SIZE, snakeHead.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
     }
 
     @Override
@@ -115,7 +113,7 @@ public class GamePanel extends JPanel implements ActionListener {
         snakeParts.add(new Coordinate(applePosition));
         snakeHead = snakeParts.get(snakeParts.size() - 1);
         ++score;
-        timer.setDelay((int) (timer.getDelay()*0.95));
+        timer.setDelay((int) (timer.getDelay() * 0.95));
     }
 
     private boolean detectBorderCollision() {
@@ -138,6 +136,7 @@ public class GamePanel extends JPanel implements ActionListener {
         }
         return false;
     }
+
     private boolean detectAppleCollision() {
         switch (snakeDirection) {
             case up -> {
@@ -183,7 +182,7 @@ public class GamePanel extends JPanel implements ActionListener {
         repaint();
     }
 
-    private void newGame() {
+    public void newGame() {
         resetSnake();
         spawnApple();
         timer.start();
@@ -192,28 +191,28 @@ public class GamePanel extends JPanel implements ActionListener {
     private boolean headCanMove(Direction direction) {
         switch (direction) {
             case up:
-                for (Coordinate part: snakeParts) {
+                for (Coordinate part : snakeParts) {
                     if (part.x == snakeHead.x && part.y == snakeHead.y - 1) {
                         return false;
                     }
                 }
                 break;
             case down:
-                for (Coordinate part: snakeParts) {
+                for (Coordinate part : snakeParts) {
                     if (part.x == snakeHead.x && part.y == snakeHead.y + 1) {
                         return false;
                     }
                 }
                 break;
             case left:
-                for (Coordinate part: snakeParts) {
+                for (Coordinate part : snakeParts) {
                     if (part.y == snakeHead.y && part.x == snakeHead.x - 1) {
                         return false;
                     }
                 }
                 break;
             case right:
-                for (Coordinate part: snakeParts) {
+                for (Coordinate part : snakeParts) {
                     if (part.y == snakeHead.y && part.x == snakeHead.x + 1) {
                         return false;
                     }
