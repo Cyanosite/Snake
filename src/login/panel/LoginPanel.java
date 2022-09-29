@@ -23,7 +23,9 @@ public class LoginPanel extends JPanel {
             User user = new User(userName.getText(), (String) comboBox.getSelectedItem());
             if (!save.exists()) {
                 try {
-                    save.createNewFile();
+                    if (!save.createNewFile()) {
+                        System.out.println("Couldn't create file");
+                    }
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
