@@ -185,6 +185,7 @@ public class GamePanel extends JPanel implements ActionListener {
     public void newGame() {
         resetSnake();
         spawnApple();
+        timer.setDelay(INITIAL_DELAY);
         timer.start();
     }
 
