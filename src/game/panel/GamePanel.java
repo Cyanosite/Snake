@@ -1,6 +1,7 @@
 package game.panel;
 
 import coordinate.Coordinate;
+import user.User;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 
 enum Direction {
@@ -25,12 +27,25 @@ public class GamePanel extends JPanel implements ActionListener {
     private static final int INITIAL_DELAY = 300;
     private final JFrame frame;
     private final Timer timer = new Timer(INITIAL_DELAY, this);
-    private int score = 0;
+    private final LinkedList<User> users;
+    private final User user;
     private final Random random = new Random();
     private final ArrayList<Coordinate> snakeParts = new ArrayList<>();
+    private Color snakeColor;
+    private int score = 0;
     private Coordinate snakeHead;
     private Coordinate applePosition;
     private Direction snakeDirection;
+
+    public GamePanel(JFrame frame, User user, LinkedList<User> users) {
+        this.frame = frame;
+        this.users = users;
+        this.user = user;
+        setSnakeColor(user.color);
+        this.setFocusable(true);
+        this.setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
+        this.addKeyListener(new GamePanel.ChangeDirectionKeyAdapter());
+    }
 
     private void resetSnake() {
         snakeParts.clear();
@@ -41,11 +56,12 @@ public class GamePanel extends JPanel implements ActionListener {
         snakeDirection = Direction.right;
     }
 
-    public GamePanel(JFrame frame) {
-        this.frame = frame;
-        this.setFocusable(true);
-        this.setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
-        this.addKeyListener(new GamePanel.ChangeDirectionKeyAdapter());
+    private void setSnakeColor(String color) {
+        switch (color) {
+            case "red" -> snakeColor = Color.RED;
+            case "green" -> snakeColor = Color.GREEN;
+            case "blue" -> snakeColor = Color.BLUE;
+        }
     }
 
     private boolean isApplePositionInValid() {
@@ -81,12 +97,11 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     private void paintSnake(Graphics graphics) {
-        graphics.setColor(Color.GREEN);
+        graphics.setColor(snakeColor);
         for (var part : snakeParts) {
             graphics.fillRect(part.x * UNIT_SIZE, part.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-            //graphics.fillRect(snakeParts.get(i).x*UNIT_SIZE, snakeParts.get(i).y*UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
         }
-        graphics.setColor(Color.decode("0x0CB312"));
+        graphics.setColor(snakeColor.darker());
         graphics.fillRect(snakeHead.x * UNIT_SIZE, snakeHead.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
     }
 
