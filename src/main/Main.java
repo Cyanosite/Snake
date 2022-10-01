@@ -27,6 +27,7 @@ public class Main {
             if (currentUser != null) {
                 GameFrame gameFrame = new GameFrame(currentUser, loginFrame.getUsers());
                 loginFrame.setVisible(false);
+                loginFrame.dispose();
                 gameFrame.setVisible(true);
                 gameFrame.newGame();
             }

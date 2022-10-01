@@ -2,6 +2,7 @@ package login.panel;
 
 import main.Main;
 import user.User;
+import user.handler.FileHandler;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -9,16 +10,15 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
 import java.util.LinkedList;
 
 public class LoginPanel extends JPanel {
+    private final FileHandler fileHandler = new FileHandler();
     private final JTextField userName = new JTextField("your username");
     private final JComboBox<String> comboBox = new JComboBox<>();
-    private final File save = new File((System.getProperty("user.dir")), "users.txt");
     private final DefaultListModel<String> listModel = new DefaultListModel<>();
+    private final JList<String> userList = new JList<>(listModel);
     private final LinkedList<User> users = new LinkedList<>();
-    private JList<String> userList = new JList<>(listModel);
     private User currentUser;
 
     public LoginPanel() {
@@ -27,12 +27,12 @@ public class LoginPanel extends JPanel {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(10, 10, 10, 10);
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        // creating the user selector
+        // creating the user selector list
         userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         userList.setLayoutOrientation(JList.VERTICAL);
         userList.setVisibleRowCount(5);
         userList.addListSelectionListener(new listListener());
-        loadUsers();
+        fileHandler.loadUsers(users);
         updateUserList();
         constraints.gridwidth = 2;
         JScrollPane scrollPane = new JScrollPane(userList);
@@ -40,6 +40,7 @@ public class LoginPanel extends JPanel {
         this.add(scrollPane, constraints);
 
         // Login section
+        // Username input
         constraints.gridwidth = 1;
         constraints.gridx = 0;
         constraints.gridy = 1;
@@ -48,6 +49,8 @@ public class LoginPanel extends JPanel {
         this.add(userName, constraints);
         constraints.gridx = 0;
         constraints.gridy = 2;
+
+        // Snake color selector
         this.add(new JLabel("Snake color: "), constraints);
         String[] comboBoxSelection = {"red", "green", "blue"};
         for (var item : comboBoxSelection) {
@@ -55,13 +58,22 @@ public class LoginPanel extends JPanel {
         }
         constraints.gridx = 1;
         this.add(comboBox, constraints);
-        JButton newUserButton = new JButton("Add User");
-        newUserButton.addActionListener(new ButtonListener());
+
+        // Add user, Remove user buttons
+        JButton addUserButton = new JButton("Add User");
+        addUserButton.addActionListener(new AddUserButtonListener());
         constraints.gridx = 0;
         constraints.gridy = 3;
-        this.add(newUserButton, constraints);
+        this.add(addUserButton, constraints);
+        JButton removeUserButton = new JButton("Remove User");
+        removeUserButton.addActionListener(new RemoveUserButtonListener());
+        constraints.gridx = 1;
+        this.add(removeUserButton, constraints);
+
+        // Start game button
         JButton startButton = new JButton("Start");
         startButton.addActionListener(new Main.StartGameListener());
+        constraints.gridy = 4;
         constraints.gridx = 1;
         this.add(startButton, constraints);
     }
@@ -75,77 +87,39 @@ public class LoginPanel extends JPanel {
     }
 
     private void updateUserList() {
-        for (int i = listModel.getSize(); i < users.size(); ++i) {
-            listModel.addElement(users.get(i).name);
-        }
-    }
-
-    private void saveUsers() {
-        if (save.exists()) {
-            try {
-                FileOutputStream fileOutputStream = new FileOutputStream(save);
-                ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream);
-                for (var user : users) {
-                    outputStream.writeObject(user);
-                }
-                outputStream.close();
-                fileOutputStream.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        } else {
-            try {
-                if (save.createNewFile()) {
-                    saveUsers();
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
-
-    private void loadUsers() {
-        if (save.exists()) {
-            users.clear();
-            FileInputStream fileInputStream = null;
-            ObjectInputStream inputStream = null;
-            try {
-                fileInputStream = new FileInputStream(save);
-                inputStream = new ObjectInputStream(fileInputStream);
-                User user = (User) inputStream.readObject();
-                while (true) {
-                    if (user != null) users.addLast(user);
-                    user = (User) inputStream.readObject();
-                }
-            } catch (EOFException ignored) {
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (inputStream != null) inputStream.close();
-                    if (fileInputStream != null) fileInputStream.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+        listModel.removeAllElements();
+        for (var user : users) {
+            listModel.addElement(user.name);
         }
     }
 
     public class listListener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
-            if (!e.getValueIsAdjusting())
-                currentUser = users.get(e.getFirstIndex());
+            if (!e.getValueIsAdjusting()) {
+                if (users.size() == 0) currentUser = null;
+                else currentUser = users.get(e.getFirstIndex());
+            }
         }
     }
 
-    private class ButtonListener implements ActionListener {
+    private class AddUserButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            currentUser = new User(userName.getText(), (String) comboBox.getSelectedItem());
+            currentUser = new User(userName.getText(), (String) comboBox.getSelectedItem(), 0);
             users.addLast(currentUser);
-            saveUsers();
-            updateUserList();
+            listModel.addElement(currentUser.name);
+            fileHandler.saveUsers(users);
+        }
+    }
+
+    private class RemoveUserButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            users.remove(userList.getSelectedIndex());
+            currentUser = null;
+            listModel.remove(userList.getSelectedIndex());
+            fileHandler.saveUsers(users);
         }
     }
 }

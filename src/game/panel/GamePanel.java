@@ -1,6 +1,7 @@
 package game.panel;
 
 import coordinate.Coordinate;
+import game.frame.GameFrame;
 import user.User;
 
 import javax.swing.*;
@@ -25,7 +26,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private static final int HORIZONTAL_UNITS = PANEL_WIDTH / UNIT_SIZE;
     private static final int VERTICAL_UNITS = PANEL_HEIGHT / UNIT_SIZE;
     private static final int INITIAL_DELAY = 300;
-    private final JFrame frame;
+    private final GameFrame frame;
     private final Timer timer = new Timer(INITIAL_DELAY, this);
     private final LinkedList<User> users;
     private final User user;
@@ -37,7 +38,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private Coordinate applePosition;
     private Direction snakeDirection;
 
-    public GamePanel(JFrame frame, User user, LinkedList<User> users) {
+    public GamePanel(GameFrame frame, User user, LinkedList<User> users) {
         this.frame = frame;
         this.users = users;
         this.user = user;
@@ -116,8 +117,16 @@ public class GamePanel extends JPanel implements ActionListener {
 
     private void gameOver() {
         timer.stop();
+        String message;
+        if (score > user.highScore) {
+            user.highScore = score;
+            frame.updateHighScore(score);
+            message = "Congratulations! Your new High Score: " + score + " Start New Game?";
+        } else {
+            message = "Game Over! Your score: " + score + " Start New Game?";
+        }
         Object[] options = {"Yes", "No"};
-        int choice = JOptionPane.showOptionDialog(this, "Game Over! Your score: " + score + " Start New Game?", "Game Over", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        int choice = JOptionPane.showOptionDialog(this, message, "Game Over", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
         switch (choice) {
             case 0 -> newGame();
             case 1 -> frame.dispose();
