@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.LinkedList;
 
 public class FileHandler {
-    private final File file = new File(System.getProperty("user.dir"), "users.txt");
+    File file = new File(System.getProperty("user.dir"), "users.txt");
 
     public void saveUsers(LinkedList<User> users) {
         if (file.exists()) {

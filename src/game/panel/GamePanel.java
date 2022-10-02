@@ -22,19 +22,19 @@ public class GamePanel extends JPanel implements ActionListener {
     private static final int PANEL_WIDTH = 800;
     private static final int PANEL_HEIGHT = 500;
     private static final int UNIT_SIZE = 25;
-    private static final int HORIZONTAL_UNITS = PANEL_WIDTH / UNIT_SIZE;
-    private static final int VERTICAL_UNITS = PANEL_HEIGHT / UNIT_SIZE;
+    static final int HORIZONTAL_UNITS = PANEL_WIDTH / UNIT_SIZE;
+    static final int VERTICAL_UNITS = PANEL_HEIGHT / UNIT_SIZE;
     private static final int INITIAL_DELAY = 300;
     private final GameFrame frame;
     private final Timer timer = new Timer(INITIAL_DELAY, this);
     private final User user;
     private final Random random = new Random();
-    private final ArrayList<Coordinate> snakeParts = new ArrayList<>();
+    ArrayList<Coordinate> snakeParts = new ArrayList<>();
+    Coordinate snakeHead;
+    Coordinate applePosition;
+    Direction snakeDirection;
     private Color snakeColor;
     private int score = 0;
-    private Coordinate snakeHead;
-    private Coordinate applePosition;
-    private Direction snakeDirection;
 
     public GamePanel(GameFrame frame, User user) {
         this.frame = frame;
@@ -160,7 +160,7 @@ public class GamePanel extends JPanel implements ActionListener {
     /**
      * @return true if the snake would go outside the grid
      */
-    private boolean detectBorderCollision() {
+    boolean detectBorderCollision() {
         if (!headCanMove(snakeDirection)) {
             return true;
         }
@@ -185,7 +185,7 @@ public class GamePanel extends JPanel implements ActionListener {
      * @return true if the snake's head will be on the apple
      * the next time it moves.
      */
-    private boolean detectAppleCollision() {
+    boolean detectAppleCollision() {
         switch (snakeDirection) {
             case up -> {
                 return snakeHead.x == applePosition.x && snakeHead.y - 1 == applePosition.y;
@@ -244,7 +244,7 @@ public class GamePanel extends JPanel implements ActionListener {
      * @param direction the direction the user wants the snake to move toward
      * @return true if the snake isn't going towards itself
      */
-    private boolean headCanMove(Direction direction) {
+    boolean headCanMove(Direction direction) {
         switch (direction) {
             case up:
                 for (Coordinate part : snakeParts) {
