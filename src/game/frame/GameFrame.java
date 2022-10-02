@@ -19,8 +19,11 @@ public class GameFrame extends JFrame {
     public GameFrame(User user, LinkedList<User> users) {
         super("Snake - " + user.name);
         this.users = users;
-        gamePanel = new GamePanel(this, user, users);
+
+        gamePanel = new GamePanel(this, user);
         this.add(gamePanel, BorderLayout.WEST);
+
+        // Leaderboard setup
         Object[][] userData = new Object[users.size()][2];
         userIndex = users.indexOf(user);
         for (int i = 0; i < users.size(); ++i) {
@@ -30,6 +33,8 @@ public class GameFrame extends JFrame {
         }
         leaderboard = new Leaderboard(userData);
         this.add(leaderboard.scrollPane, BorderLayout.EAST);
+
+        // Frame setup
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setPreferredSize(new Dimension(1000, 540));
         this.setResizable(false);
@@ -37,6 +42,12 @@ public class GameFrame extends JFrame {
         this.setLocationRelativeTo(null);
     }
 
+    /**
+     * Updates the leaderboard table with the new high score and updates
+     * the storage of the users with it.
+     *
+     * @param newHighScore the newly achieved high score of the user
+     */
     public void updateHighScore(int newHighScore) {
         leaderboard.table.setValueAt(newHighScore, userIndex, 1);
         users.get(userIndex).highScore = newHighScore;

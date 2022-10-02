@@ -27,6 +27,7 @@ public class LoginPanel extends JPanel {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(10, 10, 10, 10);
         constraints.fill = GridBagConstraints.HORIZONTAL;
+
         // creating the user selector list
         userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         userList.setLayoutOrientation(JList.VERTICAL);
@@ -86,6 +87,10 @@ public class LoginPanel extends JPanel {
         return users;
     }
 
+    /**
+     * Sets the elements of the user list to
+     * the contents of users.
+     */
     private void updateUserList() {
         listModel.removeAllElements();
         for (var user : users) {
@@ -93,6 +98,10 @@ public class LoginPanel extends JPanel {
         }
     }
 
+    /**
+     * Modifies the contents of currentUser to the
+     * current selected item in the user list.
+     */
     public class listListener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
@@ -103,6 +112,10 @@ public class LoginPanel extends JPanel {
         }
     }
 
+    /**
+     * Adds the user to the list of users then updates
+     * the user storage.
+     */
     private class AddUserButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -113,6 +126,10 @@ public class LoginPanel extends JPanel {
         }
     }
 
+    /**
+     * Removes the user from the list of users then updates
+     * the user storage.
+     */
     private class RemoveUserButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {

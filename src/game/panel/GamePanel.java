@@ -11,7 +11,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Random;
 
 enum Direction {
@@ -28,7 +27,6 @@ public class GamePanel extends JPanel implements ActionListener {
     private static final int INITIAL_DELAY = 300;
     private final GameFrame frame;
     private final Timer timer = new Timer(INITIAL_DELAY, this);
-    private final LinkedList<User> users;
     private final User user;
     private final Random random = new Random();
     private final ArrayList<Coordinate> snakeParts = new ArrayList<>();
@@ -38,9 +36,8 @@ public class GamePanel extends JPanel implements ActionListener {
     private Coordinate applePosition;
     private Direction snakeDirection;
 
-    public GamePanel(GameFrame frame, User user, LinkedList<User> users) {
+    public GamePanel(GameFrame frame, User user) {
         this.frame = frame;
-        this.users = users;
         this.user = user;
         setSnakeColor(user.color);
         this.setFocusable(true);
@@ -48,6 +45,10 @@ public class GamePanel extends JPanel implements ActionListener {
         this.addKeyListener(new GamePanel.ChangeDirectionKeyAdapter());
     }
 
+    /**
+     * Resets the position of the snake to the default top left
+     * position facing right.
+     */
     private void resetSnake() {
         snakeParts.clear();
         snakeParts.add(new Coordinate(0, 0));
@@ -65,6 +66,9 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
+    /**
+     * @return true if the apple's position is on the snake
+     */
     private boolean isApplePositionInValid() {
         for (Coordinate part : snakeParts) {
             if (part.x == applePosition.x && part.y == applePosition.y) {
@@ -74,6 +78,10 @@ public class GamePanel extends JPanel implements ActionListener {
         return false;
     }
 
+    /**
+     * Generates a new apple and puts it on the grid, the position of
+     * this apple will always be on the grid and never on the snake.
+     */
     private void spawnApple() {
         do {
             int xCoordinate = random.nextInt(HORIZONTAL_UNITS);
@@ -115,6 +123,11 @@ public class GamePanel extends JPanel implements ActionListener {
         paintSnake(graphics);
     }
 
+    /**
+     * Called when the snake collides with the wall or itself.
+     * Displays an alert where the user may choose whether they
+     * want to continue or not.
+     */
     private void gameOver() {
         timer.stop();
         String message;
@@ -133,6 +146,10 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
+    /**
+     * Extends the snake body by making the field of the apple into
+     * a part of it. Lowers the timer delay making the snake move faster.
+     */
     private void collectApple() {
         snakeParts.add(new Coordinate(applePosition));
         snakeHead = snakeParts.get(snakeParts.size() - 1);
@@ -140,6 +157,9 @@ public class GamePanel extends JPanel implements ActionListener {
         timer.setDelay((int) (timer.getDelay() * 0.95));
     }
 
+    /**
+     * @return true if the snake would go outside the grid
+     */
     private boolean detectBorderCollision() {
         if (!headCanMove(snakeDirection)) {
             return true;
@@ -161,6 +181,10 @@ public class GamePanel extends JPanel implements ActionListener {
         return false;
     }
 
+    /**
+     * @return true if the snake's head will be on the apple
+     * the next time it moves.
+     */
     private boolean detectAppleCollision() {
         switch (snakeDirection) {
             case up -> {
@@ -179,6 +203,9 @@ public class GamePanel extends JPanel implements ActionListener {
         return false;
     }
 
+    /**
+     * Moves the snake by 1 on the grid in the direction specified by the user
+     */
     private void moveSnake() {
         Coordinate newHead = new Coordinate(snakeHead);
         switch (snakeDirection) {
@@ -213,6 +240,10 @@ public class GamePanel extends JPanel implements ActionListener {
         timer.start();
     }
 
+    /**
+     * @param direction the direction the user wants the snake to move toward
+     * @return true if the snake isn't going towards itself
+     */
     private boolean headCanMove(Direction direction) {
         switch (direction) {
             case up:
@@ -247,6 +278,11 @@ public class GamePanel extends JPanel implements ActionListener {
         return true;
     }
 
+    /**
+     * The snake can be controlled by the WASD keys.
+     * This key listener sets the snake's direction depending on the
+     * key pressed
+     */
     class ChangeDirectionKeyAdapter extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent keyEvent) {
