@@ -33,13 +33,11 @@ public class GamePanel extends JPanel implements ActionListener {
     Coordinate snakeHead;
     Coordinate applePosition;
     Direction snakeDirection;
-    private Color snakeColor;
     private int score = 0;
 
     public GamePanel(GameFrame frame, User user) {
         this.frame = frame;
         this.user = user;
-        setSnakeColor(user.color);
         this.setFocusable(true);
         this.setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         this.addKeyListener(new GamePanel.ChangeDirectionKeyAdapter());
@@ -56,14 +54,6 @@ public class GamePanel extends JPanel implements ActionListener {
         snakeParts.add(new Coordinate(2, 0));
         snakeHead = snakeParts.get(2);
         snakeDirection = Direction.right;
-    }
-
-    private void setSnakeColor(String color) {
-        switch (color) {
-            case "red" -> snakeColor = Color.RED;
-            case "green" -> snakeColor = Color.GREEN;
-            case "blue" -> snakeColor = Color.BLUE;
-        }
     }
 
     /**
@@ -106,11 +96,11 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     private void paintSnake(Graphics graphics) {
-        graphics.setColor(snakeColor);
+        graphics.setColor(user.color);
         for (var part : snakeParts) {
             graphics.fillRect(part.x * UNIT_SIZE, part.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
         }
-        graphics.setColor(snakeColor.darker());
+        graphics.setColor(user.color.darker());
         graphics.fillRect(snakeHead.x * UNIT_SIZE, snakeHead.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
     }
 
@@ -121,6 +111,10 @@ public class GamePanel extends JPanel implements ActionListener {
         paintGrid(graphics);
         paintApple(graphics);
         paintSnake(graphics);
+    }
+
+    public void gameStop() {
+        timer.stop();
     }
 
     /**
@@ -234,6 +228,7 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void newGame() {
+        score = 0;
         resetSnake();
         spawnApple();
         timer.setDelay(INITIAL_DELAY);

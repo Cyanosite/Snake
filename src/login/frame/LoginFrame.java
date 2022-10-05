@@ -4,7 +4,6 @@ import login.panel.LoginPanel;
 import user.User;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.LinkedList;
 
 public class LoginFrame extends JFrame {
@@ -14,7 +13,6 @@ public class LoginFrame extends JFrame {
         super("Login");
         this.add(loginPanel);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setPreferredSize(new Dimension(500, 500));
         this.setResizable(false);
         this.pack();
         this.setLocationByPlatform(true);

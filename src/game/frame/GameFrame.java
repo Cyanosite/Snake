@@ -2,6 +2,7 @@ package game.frame;
 
 import game.leaderboard.Leaderboard;
 import game.panel.GamePanel;
+import main.Main;
 import user.User;
 import user.handler.FileHandler;
 
@@ -23,6 +24,15 @@ public class GameFrame extends JFrame {
         gamePanel = new GamePanel(this, user);
         this.add(gamePanel, BorderLayout.WEST);
 
+        // Menu setup
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("User");
+        JMenuItem menuItem = new JMenuItem("Select User");
+        menuItem.addActionListener(new Main.SelectUser());
+        menu.add(menuItem);
+        menuBar.add(menu);
+        this.add(menuBar, BorderLayout.NORTH);
+
         // Leaderboard setup
         Object[][] userData = new Object[users.size()][2];
         userIndex = users.indexOf(user);
@@ -36,10 +46,13 @@ public class GameFrame extends JFrame {
 
         // Frame setup
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setPreferredSize(new Dimension(1000, 540));
         this.setResizable(false);
         this.pack();
         this.setLocationRelativeTo(null);
+    }
+
+    public void gameStop() {
+        gamePanel.gameStop();
     }
 
     /**

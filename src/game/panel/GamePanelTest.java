@@ -7,11 +7,12 @@ import org.junit.Before;
 import org.junit.Test;
 import user.User;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 public class GamePanelTest {
     private final ArrayList<Coordinate> snakeFacingItself = new ArrayList<>();
-    GamePanel gamePanel = new GamePanel(null, new User("test", "green", 1));
+    GamePanel gamePanel = new GamePanel(null, new User("test", Color.GREEN, 1));
 
     @Before
     public void setUp() {

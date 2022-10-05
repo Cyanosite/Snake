@@ -1,32 +1,42 @@
 package login.panel;
 
+import coordinate.Coordinate;
 import main.Main;
 import user.User;
 import user.handler.FileHandler;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class LoginPanel extends JPanel {
     private final FileHandler fileHandler = new FileHandler();
     private final JTextField userName = new JTextField("your username");
-    private final JComboBox<String> comboBox = new JComboBox<>();
     private final DefaultListModel<String> listModel = new DefaultListModel<>();
     private final JList<String> userList = new JList<>(listModel);
     private final LinkedList<User> users = new LinkedList<>();
+    private final JColorChooser colorChooser = new JColorChooser();
+    private final SnakeColorPreview snakeColorPreview = new SnakeColorPreview(colorChooser.getColor());
     private User currentUser;
 
     public LoginPanel() {
+
         this.setLayout(new GridBagLayout());
         // Grid constraint setup
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(10, 10, 10, 10);
         constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.gridwidth = 2;
+        colorChooser.setPreviewPanel(snakeColorPreview);
+        colorChooser.getSelectionModel().addChangeListener(new SnakeColorPreviewUpdate());
+        this.add(colorChooser, constraints);
 
         // creating the user selector list
         userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -35,7 +45,8 @@ public class LoginPanel extends JPanel {
         userList.addListSelectionListener(new listListener());
         fileHandler.loadUsers(users);
         updateUserList();
-        constraints.gridwidth = 2;
+        constraints.gridx = 0;
+        constraints.gridy = 1;
         JScrollPane scrollPane = new JScrollPane(userList);
         scrollPane.setPreferredSize(new Dimension(250, 80));
         this.add(scrollPane, constraints);
@@ -44,21 +55,10 @@ public class LoginPanel extends JPanel {
         // Username input
         constraints.gridwidth = 1;
         constraints.gridx = 0;
-        constraints.gridy = 1;
+        constraints.gridy = 2;
         this.add(new JLabel("username: "), constraints);
         constraints.gridx = 1;
         this.add(userName, constraints);
-        constraints.gridx = 0;
-        constraints.gridy = 2;
-
-        // Snake color selector
-        this.add(new JLabel("Snake color: "), constraints);
-        String[] comboBoxSelection = {"red", "green", "blue"};
-        for (var item : comboBoxSelection) {
-            comboBox.addItem(item);
-        }
-        constraints.gridx = 1;
-        this.add(comboBox, constraints);
 
         // Add user, Remove user buttons
         JButton addUserButton = new JButton("Add User");
@@ -98,6 +98,62 @@ public class LoginPanel extends JPanel {
         }
     }
 
+    private static class SnakeColorPreview extends JPanel {
+        private final ArrayList<Coordinate> snakeParts = new ArrayList<>();
+        private final Coordinate snakeHead;
+        private final int UNIT_SIZE = 25;
+        private Color color;
+
+        public SnakeColorPreview(Color color) {
+            this.color = color;
+            snakeParts.add(new Coordinate(0, 0));
+            snakeParts.add(new Coordinate(1, 0));
+            snakeParts.add(new Coordinate(2, 0));
+            snakeHead = snakeParts.get(2);
+            this.setPreferredSize(new Dimension(75, 25));
+            this.repaint();
+        }
+
+        public void setColor(Color color) {
+            this.color = color;
+        }
+
+        private void paintGrid(Graphics graphics) {
+            graphics.setColor(Color.GRAY);
+            for (int i = 0; i <= 75; i += UNIT_SIZE) { // vertical lines
+                graphics.drawLine(i, 0, i, UNIT_SIZE);
+            }
+            for (int i = 0; i <= UNIT_SIZE; i += UNIT_SIZE) { // horizontal lines
+                graphics.drawLine(0, i, 75, i);
+            }
+        }
+
+        private void paintSnake(Graphics graphics) {
+            graphics.setColor(color);
+            for (var part : snakeParts) {
+                graphics.fillRect(part.x * UNIT_SIZE, part.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+            }
+            graphics.setColor(color.darker());
+            graphics.fillRect(snakeHead.x * UNIT_SIZE, snakeHead.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+        }
+
+        @Override
+        protected void paintComponent(Graphics graphics) {
+            super.paintComponent(graphics);
+            this.setBackground(Color.BLACK);
+            paintGrid(graphics);
+            paintSnake(graphics);
+        }
+    }
+
+    private class SnakeColorPreviewUpdate implements ChangeListener {
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            snakeColorPreview.setColor(colorChooser.getColor());
+            snakeColorPreview.repaint();
+        }
+    }
+
     /**
      * Modifies the contents of currentUser to the
      * current selected item in the user list.
@@ -119,7 +175,7 @@ public class LoginPanel extends JPanel {
     private class AddUserButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            currentUser = new User(userName.getText(), (String) comboBox.getSelectedItem(), 0);
+            currentUser = new User(userName.getText(), colorChooser.getColor(), 0);
             users.addLast(currentUser);
             listModel.addElement(currentUser.name);
             fileHandler.saveUsers(users);

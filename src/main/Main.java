@@ -10,7 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Main {
-    private static final LoginFrame loginFrame = new LoginFrame();
+    private static LoginFrame loginFrame = new LoginFrame();
+    private static GameFrame gameFrame;
 
     public static void main(String[] args) {
         try {
@@ -25,12 +26,24 @@ public class Main {
         public void actionPerformed(ActionEvent e) {
             User currentUser = loginFrame.getCurrentUser();
             if (currentUser != null) {
-                GameFrame gameFrame = new GameFrame(currentUser, loginFrame.getUsers());
+                gameFrame = new GameFrame(currentUser, loginFrame.getUsers());
                 loginFrame.setVisible(false);
                 loginFrame.dispose();
                 gameFrame.setVisible(true);
                 gameFrame.newGame();
             }
+        }
+    }
+
+    public static class SelectUser implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // Save user's game
+            loginFrame = new LoginFrame();
+            gameFrame.gameStop();
+            gameFrame.setVisible(false);
+            gameFrame.dispose();
+            loginFrame.setVisible(true);
         }
     }
 }
