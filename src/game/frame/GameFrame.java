@@ -8,6 +8,8 @@ import user.handler.FileHandler;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.LinkedList;
 
 public class GameFrame extends JFrame {
@@ -45,6 +47,7 @@ public class GameFrame extends JFrame {
         this.add(leaderboard.scrollPane, BorderLayout.EAST);
 
         // Frame setup
+        this.addWindowListener(new ExitFrameListener());
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setResizable(false);
         this.pack();
@@ -69,5 +72,12 @@ public class GameFrame extends JFrame {
 
     public void newGame() {
         gamePanel.newGame();
+    }
+
+    static class ExitFrameListener extends WindowAdapter {
+        @Override
+        public void windowClosing(WindowEvent e) {
+
+        }
     }
 }

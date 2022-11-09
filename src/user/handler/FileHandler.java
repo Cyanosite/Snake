@@ -1,8 +1,11 @@
 package user.handler;
 
+import coordinate.Coordinate;
+import game.panel.Direction;
 import user.User;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class FileHandler {
@@ -31,6 +34,29 @@ public class FileHandler {
             }
         }
     }
+
+    public void saveUserProgression(User user, ArrayList<Coordinate> snakeParts, Coordinate snakeHead, Coordinate applePosition, Direction snakeDirection, double timerDelay) {
+        File userProgressionFile = new File(System.getProperty("user.dir"), user.name);
+        try {
+            if (file.exists() || file.createNewFile()) {
+                FileOutputStream fileOutputStream = new FileOutputStream(userProgressionFile);
+                ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream);
+                outputStream.writeObject(user);
+                outputStream.writeObject(snakeParts);
+                outputStream.writeObject(snakeHead);
+                outputStream.writeObject(applePosition);
+                outputStream.writeObject(snakeDirection);
+                outputStream.writeObject(timerDelay);
+                outputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*public GameState loadUserProgression() {
+
+    }*/
 
     public void loadUsers(LinkedList<User> users) {
         if (file.exists()) {

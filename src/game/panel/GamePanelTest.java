@@ -8,10 +8,10 @@ import org.junit.Test;
 import user.User;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class GamePanelTest {
-    private final ArrayList<Coordinate> snakeFacingItself = new ArrayList<>();
+    private final LinkedList<Coordinate> snakeFacingItself = new LinkedList<>();
     GamePanel gamePanel = new GamePanel(null, new User("test", Color.GREEN, 1));
 
     @Before

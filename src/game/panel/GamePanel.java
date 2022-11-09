@@ -10,14 +10,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 
-enum Direction {
-    up, down, left, right
-}
-
-// TODO: Add scoreboard and edit alert to show personal best
 public class GamePanel extends JPanel implements ActionListener {
     private static final int PANEL_WIDTH = 800;
     private static final int PANEL_HEIGHT = 500;
@@ -29,7 +24,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private final Timer timer = new Timer(INITIAL_DELAY, this);
     private final User user;
     private final Random random = new Random();
-    ArrayList<Coordinate> snakeParts = new ArrayList<>();
+    LinkedList<Coordinate> snakeParts = new LinkedList<>();
     Coordinate snakeHead;
     Coordinate applePosition;
     Direction snakeDirection;
@@ -41,6 +36,10 @@ public class GamePanel extends JPanel implements ActionListener {
         this.setFocusable(true);
         this.setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         this.addKeyListener(new GamePanel.ChangeDirectionKeyAdapter());
+    }
+
+    public static void saveUserProgression() {
+
     }
 
     /**
