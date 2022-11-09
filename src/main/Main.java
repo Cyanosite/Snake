@@ -38,7 +38,6 @@ public class Main {
     public static class SelectUser implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            // Save user's game
             loginFrame = new LoginFrame();
             gameFrame.gameStop();
             gameFrame.setVisible(false);

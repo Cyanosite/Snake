@@ -1,7 +1,9 @@
 package game.panel;
 
+import apple.Apple;
 import coordinate.Coordinate;
 import game.frame.GameFrame;
+import snake.Snake;
 import user.User;
 
 import javax.swing.*;
@@ -10,25 +12,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.LinkedList;
-import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener {
-    private static final int PANEL_WIDTH = 800;
-    private static final int PANEL_HEIGHT = 500;
-    private static final int UNIT_SIZE = 25;
+    static final int PANEL_WIDTH = 400;
+    static final int PANEL_HEIGHT = 300;
+    static final int UNIT_SIZE = 25;
     static final int HORIZONTAL_UNITS = PANEL_WIDTH / UNIT_SIZE;
     static final int VERTICAL_UNITS = PANEL_HEIGHT / UNIT_SIZE;
-    private static final int INITIAL_DELAY = 300;
-    private final GameFrame frame;
-    private final Timer timer = new Timer(INITIAL_DELAY, this);
-    private final User user;
-    private final Random random = new Random();
-    LinkedList<Coordinate> snakeParts = new LinkedList<>();
-    Coordinate snakeHead;
-    Coordinate applePosition;
-    Direction snakeDirection;
-    private int score = 0;
+    static final int INITIAL_DELAY = 200;
+    final GameFrame frame;
+    final Timer timer = new Timer(INITIAL_DELAY, this);
+    final User user;
+    final Snake snake = new Snake(HORIZONTAL_UNITS, VERTICAL_UNITS);
+    final Apple apple = new Apple(HORIZONTAL_UNITS, VERTICAL_UNITS);
+    int score = 0;
 
     public GamePanel(GameFrame frame, User user) {
         this.frame = frame;
@@ -36,47 +33,6 @@ public class GamePanel extends JPanel implements ActionListener {
         this.setFocusable(true);
         this.setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         this.addKeyListener(new GamePanel.ChangeDirectionKeyAdapter());
-    }
-
-    public static void saveUserProgression() {
-
-    }
-
-    /**
-     * Resets the position of the snake to the default top left
-     * position facing right.
-     */
-    private void resetSnake() {
-        snakeParts.clear();
-        snakeParts.add(new Coordinate(0, 0));
-        snakeParts.add(new Coordinate(1, 0));
-        snakeParts.add(new Coordinate(2, 0));
-        snakeHead = snakeParts.get(2);
-        snakeDirection = Direction.right;
-    }
-
-    /**
-     * @return true if the apple's position is on the snake
-     */
-    private boolean isApplePositionInValid() {
-        for (Coordinate part : snakeParts) {
-            if (part.x == applePosition.x && part.y == applePosition.y) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Generates a new apple and puts it on the grid, the position of
-     * this apple will always be on the grid and never on the snake.
-     */
-    private void spawnApple() {
-        do {
-            int xCoordinate = random.nextInt(HORIZONTAL_UNITS);
-            int yCoordinate = random.nextInt(VERTICAL_UNITS);
-            applePosition = new Coordinate(xCoordinate, yCoordinate);
-        } while (isApplePositionInValid());
     }
 
     private void paintGrid(Graphics graphics) {
@@ -91,15 +47,17 @@ public class GamePanel extends JPanel implements ActionListener {
 
     private void paintApple(Graphics graphics) {
         graphics.setColor(Color.RED);
+        Coordinate applePosition = apple.getPosition();
         graphics.fillOval(applePosition.x * UNIT_SIZE, applePosition.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
     }
 
     private void paintSnake(Graphics graphics) {
         graphics.setColor(user.color);
-        for (var part : snakeParts) {
+        for (var part : snake.getParts()) {
             graphics.fillRect(part.x * UNIT_SIZE, part.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
         }
         graphics.setColor(user.color.darker());
+        Coordinate snakeHead = snake.getHead();
         graphics.fillRect(snakeHead.x * UNIT_SIZE, snakeHead.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
     }
 
@@ -121,7 +79,7 @@ public class GamePanel extends JPanel implements ActionListener {
      * Displays an alert where the user may choose whether they
      * want to continue or not.
      */
-    private void gameOver() {
+    void gameOver() {
         timer.stop();
         String message;
         if (score > user.highScore) {
@@ -144,132 +102,48 @@ public class GamePanel extends JPanel implements ActionListener {
      * a part of it. Lowers the timer delay making the snake move faster.
      */
     private void collectApple() {
-        snakeParts.add(new Coordinate(applePosition));
-        snakeHead = snakeParts.get(snakeParts.size() - 1);
+        snake.expand(apple.getPosition());
         ++score;
-        timer.setDelay((int) (timer.getDelay() * 0.95));
+        timer.setDelay((int) (timer.getDelay() * 0.98));
     }
 
-    /**
-     * @return true if the snake would go outside the grid
-     */
-    boolean detectBorderCollision() {
-        if (!headCanMove(snakeDirection)) {
-            return true;
-        }
-        switch (snakeDirection) {
-            case up -> {
-                return snakeHead.y == 0;
-            }
-            case down -> {
-                return snakeHead.y == VERTICAL_UNITS - 1;
-            }
-            case left -> {
-                return snakeHead.x == 0;
-            }
-            case right -> {
-                return snakeHead.x == HORIZONTAL_UNITS - 1;
-            }
-        }
-        return false;
-    }
 
     /**
      * @return true if the snake's head will be on the apple
      * the next time it moves.
      */
     boolean detectAppleCollision() {
-        switch (snakeDirection) {
-            case up -> {
-                return snakeHead.x == applePosition.x && snakeHead.y - 1 == applePosition.y;
-            }
-            case down -> {
-                return snakeHead.x == applePosition.x && snakeHead.y + 1 == applePosition.y;
-            }
-            case left -> {
-                return snakeHead.y == applePosition.y && snakeHead.x - 1 == applePosition.x;
-            }
-            case right -> {
-                return snakeHead.y == applePosition.y && snakeHead.x + 1 == applePosition.x;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Moves the snake by 1 on the grid in the direction specified by the user
-     */
-    private void moveSnake() {
-        Coordinate newHead = new Coordinate(snakeHead);
-        switch (snakeDirection) {
-            case up -> --newHead.y;
-            case down -> ++newHead.y;
-            case left -> --newHead.x;
-            case right -> ++newHead.x;
-        }
-        snakeParts.add(newHead);
-        snakeHead = newHead;
-        snakeParts.remove(0);
+        Coordinate applePosition = apple.getPosition();
+        Coordinate snakeHead = snake.getHead();
+        return switch (snake.direction) {
+            case up -> snakeHead.x == applePosition.x && snakeHead.y - 1 == applePosition.y;
+            case down -> snakeHead.x == applePosition.x && snakeHead.y + 1 == applePosition.y;
+            case left -> snakeHead.y == applePosition.y && snakeHead.x - 1 == applePosition.x;
+            case right -> snakeHead.y == applePosition.y && snakeHead.x + 1 == applePosition.x;
+        };
     }
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        if (detectBorderCollision()) {
+        if (snake.collision()) {
             gameOver();
         }
         if (detectAppleCollision()) {
             collectApple();
-            spawnApple();
+            apple.spawn(snake.getParts());
+            snake.flip();
         } else {
-            moveSnake();
+            snake.move();
         }
         repaint();
     }
 
     public void newGame() {
         score = 0;
-        resetSnake();
-        spawnApple();
+        snake.reset();
+        apple.spawn(snake.getParts());
         timer.setDelay(INITIAL_DELAY);
         timer.start();
-    }
-
-    /**
-     * @param direction the direction the user wants the snake to move toward
-     * @return true if the snake isn't going towards itself
-     */
-    boolean headCanMove(Direction direction) {
-        switch (direction) {
-            case up:
-                for (Coordinate part : snakeParts) {
-                    if (part.x == snakeHead.x && part.y == snakeHead.y - 1) {
-                        return false;
-                    }
-                }
-                break;
-            case down:
-                for (Coordinate part : snakeParts) {
-                    if (part.x == snakeHead.x && part.y == snakeHead.y + 1) {
-                        return false;
-                    }
-                }
-                break;
-            case left:
-                for (Coordinate part : snakeParts) {
-                    if (part.y == snakeHead.y && part.x == snakeHead.x - 1) {
-                        return false;
-                    }
-                }
-                break;
-            case right:
-                for (Coordinate part : snakeParts) {
-                    if (part.y == snakeHead.y && part.x == snakeHead.x + 1) {
-                        return false;
-                    }
-                }
-                break;
-        }
-        return true;
     }
 
     /**
@@ -280,31 +154,7 @@ public class GamePanel extends JPanel implements ActionListener {
     class ChangeDirectionKeyAdapter extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent keyEvent) {
-            switch (keyEvent.getKeyChar()) {
-                case 'w':
-                    if (headCanMove(Direction.up)) {
-                        snakeDirection = Direction.up;
-                    }
-                    break;
-                case 's':
-                    if (headCanMove(Direction.down)) {
-                        snakeDirection = Direction.down;
-                    }
-                    break;
-                case 'a':
-                    if (headCanMove(Direction.left)) {
-                        snakeDirection = Direction.left;
-                    }
-                    break;
-                case 'd':
-                    if (headCanMove(Direction.right)) {
-                        snakeDirection = Direction.right;
-                    }
-                    break;
-                case ' ':
-                    newGame();
-                    break;
-            }
+            snake.changeDirection(keyEvent.getKeyChar());
         }
     }
 }

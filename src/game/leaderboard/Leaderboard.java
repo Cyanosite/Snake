@@ -1,17 +1,26 @@
 package game.leaderboard;
 
+import user.User;
+
 import javax.swing.*;
 import java.awt.*;
+import java.util.LinkedList;
 
-public class Leaderboard {
-    public final JScrollPane scrollPane;
-    public final JTable table;
+public class Leaderboard extends JScrollPane {
+    final JTable table;
+    String[] columnNames = {"User", "HighScore"};
 
-    public Leaderboard(Object[][] data) {
-        table = new JTable(data, new String[]{"User", "HighScore"});
-        table.setFillsViewportHeight(true);
-        table.setEnabled(false);
-        scrollPane = new JScrollPane(table);
-        scrollPane.setPreferredSize(new Dimension(200, 540));
+    public Leaderboard(LinkedList<User> users) {
+        Object[][] userData = new Object[users.size()][2];
+        for (int i = 0; i < users.size(); ++i) {
+            userData[i] = users.get(i).toArray();
+        }
+        table = new JTable(userData, columnNames);
+        this.setViewportView(table);
+        this.setPreferredSize(new Dimension(200, 300));
+    }
+
+    public void updateScoreAt(int index, int score) {
+        table.setValueAt(score, index, 1);
     }
 }
