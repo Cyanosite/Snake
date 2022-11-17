@@ -1,6 +1,5 @@
-package login.panel;
+package login;
 
-import coordinate.Coordinate;
 import main.Main;
 import user.User;
 import user.handler.FileHandler;
@@ -13,21 +12,21 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class LoginPanel extends JPanel {
-    private final FileHandler fileHandler = new FileHandler();
-    private final JTextField userName = new JTextField("your username");
-    private final DefaultListModel<String> listModel = new DefaultListModel<>();
-    private final JList<String> userList = new JList<>(listModel);
-    private final LinkedList<User> users = new LinkedList<>();
-    private final JColorChooser colorChooser = new JColorChooser();
-    private final SnakeColorPreview snakeColorPreview = new SnakeColorPreview(colorChooser.getColor());
-    private User currentUser;
+public class LoginFrame extends JFrame {
+    static final FileHandler fileHandler = new FileHandler();
+    final JTextField userName = new JTextField("your username");
+    final DefaultListModel<String> listModel = new DefaultListModel<>();
+    final JList<String> userList = new JList<>(listModel);
+    final JColorChooser colorChooser = new JColorChooser();
+    final SnakeColorPreview snakeColorPreview = new SnakeColorPreview(colorChooser.getColor());
+    LinkedList<User> users = new LinkedList<>();
+    User currentUser;
 
-    public LoginPanel() {
-
+    public LoginFrame() {
+        super("Login");
+        //this.add(loginPanel);
         this.setLayout(new GridBagLayout());
         // Grid constraint setup
         GridBagConstraints constraints = new GridBagConstraints();
@@ -42,8 +41,8 @@ public class LoginPanel extends JPanel {
         userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         userList.setLayoutOrientation(JList.VERTICAL);
         userList.setVisibleRowCount(5);
-        userList.addListSelectionListener(new listListener());
-        fileHandler.loadUsers(users);
+        userList.getSelectionModel().addListSelectionListener(new listListener());
+        users = fileHandler.loadUsers();
         updateUserList();
         constraints.gridx = 0;
         constraints.gridy = 1;
@@ -77,14 +76,12 @@ public class LoginPanel extends JPanel {
         constraints.gridy = 4;
         constraints.gridx = 1;
         this.add(startButton, constraints);
-    }
 
-    public User getCurrentUser() {
-        return currentUser;
-    }
-
-    public LinkedList<User> getUsers() {
-        return users;
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setResizable(false);
+        this.pack();
+        this.setLocationByPlatform(true);
+        this.setVisible(true);
     }
 
     /**
@@ -98,59 +95,22 @@ public class LoginPanel extends JPanel {
         }
     }
 
-    private static class SnakeColorPreview extends JPanel {
-        private final ArrayList<Coordinate> snakeParts = new ArrayList<>();
-        private final Coordinate snakeHead;
-        private final int UNIT_SIZE = 25;
-        private Color color;
+    public User getCurrentUser() {
+        return currentUser;
+    }
 
-        public SnakeColorPreview(Color color) {
-            this.color = color;
-            snakeParts.add(new Coordinate(0, 0));
-            snakeParts.add(new Coordinate(1, 0));
-            snakeParts.add(new Coordinate(2, 0));
-            snakeHead = snakeParts.get(2);
-            this.setPreferredSize(new Dimension(75, 25));
-            this.repaint();
-        }
-
-        public void setColor(Color color) {
-            this.color = color;
-        }
-
-        private void paintGrid(Graphics graphics) {
-            graphics.setColor(Color.GRAY);
-            for (int i = 0; i <= 75; i += UNIT_SIZE) { // vertical lines
-                graphics.drawLine(i, 0, i, UNIT_SIZE);
-            }
-            for (int i = 0; i <= UNIT_SIZE; i += UNIT_SIZE) { // horizontal lines
-                graphics.drawLine(0, i, 75, i);
-            }
-        }
-
-        private void paintSnake(Graphics graphics) {
-            graphics.setColor(color);
-            for (var part : snakeParts) {
-                graphics.fillRect(part.x * UNIT_SIZE, part.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-            }
-            graphics.setColor(color.darker());
-            graphics.fillRect(snakeHead.x * UNIT_SIZE, snakeHead.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-        }
-
-        @Override
-        protected void paintComponent(Graphics graphics) {
-            super.paintComponent(graphics);
-            this.setBackground(Color.BLACK);
-            paintGrid(graphics);
-            paintSnake(graphics);
-        }
+    public LinkedList<User> getUsers() {
+        return users;
     }
 
     private class SnakeColorPreviewUpdate implements ChangeListener {
         @Override
         public void stateChanged(ChangeEvent e) {
-            snakeColorPreview.setColor(colorChooser.getColor());
-            snakeColorPreview.repaint();
+            if (currentUser == null) return;
+            Color color = colorChooser.getColor();
+            snakeColorPreview.setColor(color);
+            currentUser.color = color;
+            fileHandler.saveUsers(users);
         }
     }
 
@@ -161,10 +121,11 @@ public class LoginPanel extends JPanel {
     public class listListener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
-            if (!e.getValueIsAdjusting()) {
-                if (users.size() == 0) currentUser = null;
-                else currentUser = users.get(e.getFirstIndex());
-            }
+            if (e.getValueIsAdjusting()) return;
+            if (users.size() == 0) return;
+            ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+            currentUser = users.get(lsm.getMinSelectionIndex());
+            snakeColorPreview.setColor(currentUser.color);
         }
     }
 

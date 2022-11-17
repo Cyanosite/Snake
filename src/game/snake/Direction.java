@@ -1,4 +1,4 @@
-package snake;
+package game.snake;
 
 import java.io.Serializable;
 

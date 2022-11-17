@@ -32,9 +32,9 @@ public class FileHandler {
         }
     }
 
-    public void loadUsers(LinkedList<User> users) {
+    public LinkedList<User> loadUsers() {
+        LinkedList<User> users = new LinkedList<>();
         if (file.exists()) {
-            users.clear();
             FileInputStream fileInputStream = null;
             ObjectInputStream inputStream = null;
             try {
@@ -58,5 +58,6 @@ public class FileHandler {
                 }
             }
         }
+        return users;
     }
 }

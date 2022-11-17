@@ -2,7 +2,7 @@ package main;
 
 
 import game.frame.GameFrame;
-import login.frame.LoginFrame;
+import login.LoginFrame;
 import user.User;
 
 import javax.swing.*;
@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Main {
-    private static LoginFrame loginFrame = new LoginFrame();
+    private static final LoginFrame loginFrame = new LoginFrame();
     private static GameFrame gameFrame;
 
     public static void main(String[] args) {
@@ -38,7 +38,7 @@ public class Main {
     public static class SelectUser implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            loginFrame = new LoginFrame();
+            loginFrame.pack();
             gameFrame.gameStop();
             gameFrame.setVisible(false);
             gameFrame.dispose();

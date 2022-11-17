@@ -8,12 +8,12 @@ import java.io.File;
 import java.util.LinkedList;
 
 public class FileHandlerTest {
-    private final FileHandler fileHandler = new FileHandler();
     private final LinkedList<User> initialUsers = new LinkedList<>();
-    private final LinkedList<User> actualUsers = new LinkedList<>();
+    private FileHandler fileHandler;
 
     @org.junit.Before
     public void setUp() {
+        fileHandler = new FileHandler();
         fileHandler.file = new File(System.getProperty("user.dir"), "text.txt");
         initialUsers.addLast(new User("alma", Color.RED, 14));
         initialUsers.addLast(new User("szilva", Color.BLUE, 17));
@@ -27,19 +27,13 @@ public class FileHandlerTest {
 
     @org.junit.Test
     public void saveUsers() {
-        actualUsers.clear();
         fileHandler.saveUsers(initialUsers);
-        fileHandler.loadUsers(actualUsers);
-        for (int i = 0; i < initialUsers.size(); ++i) {
-            Assert.assertEquals(initialUsers.get(i), actualUsers.get(i));
-        }
     }
 
     @org.junit.Test
     public void loadUsers() {
-        actualUsers.clear();
-        fileHandler.saveUsers(initialUsers);
-        fileHandler.loadUsers(actualUsers);
+        LinkedList<User> actualUsers = fileHandler.loadUsers();
+        Assert.assertNotNull(actualUsers);
         for (int i = 0; i < initialUsers.size(); ++i) {
             Assert.assertEquals(initialUsers.get(i), actualUsers.get(i));
         }

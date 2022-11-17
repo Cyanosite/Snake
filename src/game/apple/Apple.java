@@ -1,4 +1,4 @@
-package apple;
+package game.apple;
 
 import coordinate.Coordinate;
 
@@ -21,7 +21,7 @@ public class Apple {
 
     /**
      * Generates a new apple and puts it on the grid, the position of
-     * this apple will always be on the grid and never on the snake.
+     * this apple will always be on the grid and never on the game.snake.
      */
     public void spawn(LinkedList<Coordinate> parts) {
         do {

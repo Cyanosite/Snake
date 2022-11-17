@@ -1,4 +1,4 @@
-package snake;
+package game.snake;
 
 import coordinate.Coordinate;
 
@@ -7,13 +7,14 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 public class Snake {
-    final LinkedList<Coordinate> parts = new LinkedList<>();
     final Dimension map;
     public Direction direction;
+    LinkedList<Coordinate> parts = new LinkedList<>();
     Coordinate head;
 
     public Snake(int width, int height) {
         map = new Dimension(width, height);
+        this.reset();
     }
 
     public Coordinate getHead() {
@@ -129,7 +130,7 @@ public class Snake {
         }
         parts.add(newHead);
         head = newHead;
-        parts.remove(0);
+        parts.removeFirst();
     }
 
     /**
