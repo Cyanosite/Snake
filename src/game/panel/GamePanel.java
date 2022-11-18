@@ -75,7 +75,7 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Called when the game.snake collides with the wall or itself.
+     * Called when the snake collides with the wall or itself.
      * Displays an alert where the user may choose whether they
      * want to continue or not.
      */
@@ -98,8 +98,8 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Extends the game.snake body by making the field of the apple into
-     * a part of it. Lowers the timer delay making the game.snake move faster.
+     * Extends the snake body by making the field of the apple into
+     * a part of it. Lowers the timer delay making the snake move faster.
      */
     private void collectApple() {
         snake.expand(apple.getPosition());
@@ -109,7 +109,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 
     /**
-     * @return true if the game.snake's head will be on the apple
+     * @return true if the snake's head will be on the apple
      * the next time it moves.
      */
     boolean detectAppleCollision() {
@@ -147,8 +147,8 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     /**
-     * The game.snake can be controlled by the WASD keys.
-     * This key listener sets the game.snake's direction depending on the
+     * The snake can be controlled by the WASD keys.
+     * This key listener sets the snake's direction depending on the
      * key pressed
      */
     class ChangeDirectionKeyAdapter extends KeyAdapter {

@@ -1,5 +1,9 @@
 package coordinate;
 
+/**
+ * Responsible for identifying the different cells on the grid,
+ * where the Snake can move.
+ */
 public class Coordinate {
     public int x;
     public int y;
