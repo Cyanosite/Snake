@@ -134,7 +134,7 @@ public class Snake {
     }
 
     /**
-     * Flips the snake and starts moving it in the opposite direction;
+     * Flips the snake and starts moving it in the opposite direction
      */
     public void flip() {
         Collections.reverse(parts);

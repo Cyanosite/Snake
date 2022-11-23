@@ -21,7 +21,7 @@ public class LoginFrame extends JFrame {
     final JList<String> userList = new JList<>(listModel);
     final JColorChooser colorChooser = new JColorChooser();
     final SnakeColorPreview snakeColorPreview = new SnakeColorPreview(colorChooser.getColor());
-    LinkedList<User> users = new LinkedList<>();
+    LinkedList<User> users;
     User currentUser;
 
     public LoginFrame() {
@@ -124,8 +124,10 @@ public class LoginFrame extends JFrame {
             if (e.getValueIsAdjusting()) return;
             if (users.size() == 0) return;
             ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-            currentUser = users.get(lsm.getMinSelectionIndex());
-            snakeColorPreview.setColor(currentUser.color);
+            int index = lsm.getMinSelectionIndex();
+            currentUser = index < 0 ? null : users.get(index);
+            if (currentUser != null)
+                snakeColorPreview.setColor(currentUser.color);
         }
     }
 
@@ -153,6 +155,7 @@ public class LoginFrame extends JFrame {
             users.remove(userList.getSelectedIndex());
             currentUser = null;
             listModel.remove(userList.getSelectedIndex());
+            userList.clearSelection();
             fileHandler.saveUsers(users);
         }
     }
