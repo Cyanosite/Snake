@@ -1,23 +1,13 @@
 package game.snake;
 
 import coordinate.Coordinate;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.LinkedList;
 
 public class SnakeTest {
     private final Snake snake = new Snake(16, 12);
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
 
     /**
      * Snake going upwards and tries to go back into itself

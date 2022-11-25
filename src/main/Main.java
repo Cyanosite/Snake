@@ -21,6 +21,11 @@ public class Main {
         }
     }
 
+    /**
+     * Fires when the user clicks the Start button in the LoginFrame.
+     * This disposes the LoginFrame and creates the GameFrame and starts
+     * a new game.
+     */
     public static class StartGameListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -35,6 +40,10 @@ public class Main {
         }
     }
 
+    /**
+     * Fires when the user clicks the User -> Select User menu option.
+     * This takes the user back to the LoginFrame.
+     */
     public static class SelectUser implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {

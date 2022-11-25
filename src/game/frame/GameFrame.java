@@ -56,6 +56,10 @@ public class GameFrame extends JFrame {
         fileHandler.saveUsers(users);
     }
 
+    /**
+     * Starts the game itself. This is called from the Main class
+     * to start a game when the window is created
+     */
     public void newGame() {
         gamePanel.newGame();
     }

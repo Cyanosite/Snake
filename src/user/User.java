@@ -32,6 +32,11 @@ public class User implements Serializable {
         return nameEquals && colorEquals && highScoreEquals;
     }
 
+    /**
+     * This is used in the Leaderboard when displaying a row
+     *
+     * @return an array of the name and high score
+     */
     public Object[] toArray() {
         return new Object[]{name, highScore};
     }

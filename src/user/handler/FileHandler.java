@@ -6,57 +6,34 @@ import java.io.*;
 import java.util.LinkedList;
 
 public class FileHandler {
-    File file = new File(System.getProperty("user.dir"), "users.txt");
+    static File file = new File(System.getProperty("user.dir"), "users.txt");
 
+    /**
+     * Save the users to a txt file in a Serialized way
+     *
+     * @param users the collection of the users to save
+     */
     public void saveUsers(LinkedList<User> users) {
-        if (file.exists()) {
-            try {
-                FileOutputStream fileOutputStream = new FileOutputStream(file);
-                ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream);
-                for (var user : users) {
-                    outputStream.writeObject(user);
-                }
-                outputStream.close();
-                fileOutputStream.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        } else {
-            try {
-                if (file.createNewFile()) {
-                    saveUsers(users);
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file))) {
+            outputStream.writeObject(users);
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 
+    /**
+     * Loads the users from the users.txt file
+     *
+     * @return always returns a LinkedList of Users,
+     * if something went wrong it will be empty
+     */
     public LinkedList<User> loadUsers() {
         LinkedList<User> users = new LinkedList<>();
-        if (file.exists()) {
-            FileInputStream fileInputStream = null;
-            ObjectInputStream inputStream = null;
-            try {
-                fileInputStream = new FileInputStream(file);
-                inputStream = new ObjectInputStream(fileInputStream);
-                User user = (User) inputStream.readObject();
-                while (true) {
-                    if (user != null) users.addLast(user);
-                    else break;
-                    user = (User) inputStream.readObject();
-                }
-            } catch (EOFException ignored) {
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (inputStream != null) inputStream.close();
-                    if (fileInputStream != null) fileInputStream.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+        if (!file.exists()) return users;
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file))) {
+            users = (LinkedList<User>) inputStream.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return users;
     }

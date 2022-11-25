@@ -6,6 +6,10 @@ import game.snake.Snake;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * This overrides the default preview of the ColorPicker class
+ * to show a Snake instead.
+ */
 class SnakeColorPreview extends JPanel {
     private static final int UNIT_SIZE = 25;
     private final Snake snake;
@@ -13,6 +17,7 @@ class SnakeColorPreview extends JPanel {
 
     public SnakeColorPreview(Color color) {
         this.color = color;
+        // set the Size of the preview to the default Snake size
         this.snake = new Snake(3, 1);
         this.setPreferredSize(new Dimension(75, 25));
     }
@@ -22,16 +27,11 @@ class SnakeColorPreview extends JPanel {
         this.repaint();
     }
 
-    private void paintGrid(Graphics graphics) {
-        graphics.setColor(Color.GRAY);
-        for (int i = 0; i <= 75; i += UNIT_SIZE) { // vertical lines
-            graphics.drawLine(i, 0, i, UNIT_SIZE);
-        }
-        for (int i = 0; i <= UNIT_SIZE; i += UNIT_SIZE) { // horizontal lines
-            graphics.drawLine(0, i, 75, i);
-        }
-    }
-
+    /**
+     * Draw the snake on the panel
+     *
+     * @param graphics given by paintComponent
+     */
     private void paintSnake(Graphics graphics) {
         graphics.setColor(color);
         for (var part : snake.getParts()) {
@@ -46,7 +46,6 @@ class SnakeColorPreview extends JPanel {
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         this.setBackground(Color.BLACK);
-        paintGrid(graphics);
         paintSnake(graphics);
     }
 }

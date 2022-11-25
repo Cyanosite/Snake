@@ -112,6 +112,11 @@ public class Snake {
         direction = Direction.right;
     }
 
+    /**
+     * Expands the snake into the coordinate of the apple.
+     *
+     * @param applePosition the position of the apple
+     */
     public void expand(Coordinate applePosition) {
         parts.add(new Coordinate(applePosition));
         head = parts.get(parts.size() - 1);

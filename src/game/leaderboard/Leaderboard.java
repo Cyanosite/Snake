@@ -20,6 +20,12 @@ public class Leaderboard extends JScrollPane {
         this.setPreferredSize(new Dimension(200, 300));
     }
 
+    /**
+     * Updates the leaderboard with the new high score.
+     *
+     * @param index row of the table to be updated
+     * @param score new high score of selected player
+     */
     public void updateScoreAt(int index, int score) {
         table.setValueAt(score, index, 1);
     }

@@ -35,6 +35,11 @@ public class GamePanel extends JPanel implements ActionListener {
         this.addKeyListener(new GamePanel.ChangeDirectionKeyAdapter());
     }
 
+    /**
+     * Draws the grid on the panel.
+     *
+     * @param graphics given by the paintComponent method
+     */
     private void paintGrid(Graphics graphics) {
         graphics.setColor(Color.GRAY);
         for (int i = 0; i <= PANEL_WIDTH; i += UNIT_SIZE) { // vertical lines
@@ -45,12 +50,24 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
+    /**
+     * Draws the apple on the panel.
+     *
+     * @param graphics given by the paintComponent method
+     */
     private void paintApple(Graphics graphics) {
         graphics.setColor(Color.RED);
         Coordinate applePosition = apple.getPosition();
         graphics.fillOval(applePosition.x * UNIT_SIZE, applePosition.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
     }
 
+    /**
+     * Draws the snake on the panel.
+     * It draws the head with the color selected by the user and
+     * makes the head a bit darker with the color's darker method.
+     *
+     * @param graphics given by the paintComponent method
+     */
     private void paintSnake(Graphics graphics) {
         graphics.setColor(user.color);
         for (var part : snake.getParts()) {
@@ -123,6 +140,11 @@ public class GamePanel extends JPanel implements ActionListener {
         };
     }
 
+    /**
+     * Called every time the Timer class fires.
+     *
+     * @param actionEvent the event to be processed
+     */
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         if (snake.collision()) {
@@ -138,6 +160,9 @@ public class GamePanel extends JPanel implements ActionListener {
         repaint();
     }
 
+    /**
+     * Starts a new game, this MUST be called in the constructor.
+     */
     public void newGame() {
         score = 0;
         snake.reset();
